@@ -27,29 +27,30 @@ push_new_commits() {
     
     # Get last commit information for PR body
     LAST_COMMIT_HASH=$(git rev-parse HEAD)
-    LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
-    LAST_COMMIT_AUTHOR=$(git log -1 --pretty=%an)
+    LAST_COMMIT_MSG=$(git log -1 --pretty=%B | sed 's/"/\\"/g' | tr '\n' ' ')
+    LAST_COMMIT_AUTHOR=$(git log -1 --pretty=%an | sed 's/"/\\"/g')
     LAST_COMMIT_DATE=$(git log -1 --pretty=%ad --date=format:'%Y-%m-%d %H:%M:%S')
     
     # Create PR if GitHub token is available
     if [ -n "${INPUT_TARGET_REPO_TOKEN}" ]; then
         PR_TITLE="Sync updates from source repository"
-        PR_BODY="## Automated Sync Update
         
-### Changes included in this PR:
-- Latest commit: \`${LAST_COMMIT_HASH}\`
-- Commit message: ${LAST_COMMIT_MSG}
-- Author: ${LAST_COMMIT_AUTHOR}
-- Date: ${LAST_COMMIT_DATE}
-
-This PR was automatically created by the sync workflow to update the target branch with latest changes from source repository."
+        # Create simplified PR body with proper JSON escaping
+        PR_BODY="## Automated Sync Update\n\n### Changes included in this PR:\n- Latest commit: ${LAST_COMMIT_HASH}\n- Commit message: ${LAST_COMMIT_MSG}\n- Author: ${LAST_COMMIT_AUTHOR}\n- Date: ${LAST_COMMIT_DATE}\n\nThis PR was automatically created by the sync workflow."
+        
+        # Create JSON payload for PR creation
+        JSON_PAYLOAD="{\"title\":\"${PR_TITLE}\",\"body\":\"${PR_BODY}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"${INPUT_TARGET_SYNC_BRANCH}\"}"
+        
+        # For debugging
+        echo "${JSON_PAYLOAD}" > /tmp/pr_payload.json
         
         # Create PR using GitHub API
         PR_RESPONSE=$(curl -s -X POST \
             -H "Authorization: token ${INPUT_TARGET_REPO_TOKEN}" \
             -H "Accept: application/vnd.github.v3+json" \
+            -H "Content-Type: application/json" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls" \
-            -d "{\"title\":\"${PR_TITLE}\",\"body\":\"${PR_BODY}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"${INPUT_TARGET_SYNC_BRANCH}\"}")
+            -d "${JSON_PAYLOAD}")
         
         # Check if PR was created successfully
         if echo "${PR_RESPONSE}" | grep -q "\"number\""; then
