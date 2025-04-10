@@ -37,7 +37,7 @@ push_new_commits() {
         PR_TITLE="Sync updates from source repository"
         
         # Create simplified PR body with proper JSON escaping
-        PR_BODY="## Automated Sync Update\n\n### Changes included in this PR:\n- Latest commit: ${LAST_COMMIT_HASH}\n- Commit message: ${LAST_COMMIT_MSG}\n- Author: ${LAST_COMMIT_AUTHOR}\n- Date: ${LAST_COMMIT_DATE}\n\nThis PR was automatically created by the sync workflow."
+        PR_BODY="## Automated Sync Update\n\n### Changes included in this PR:\n- Latest commit: ${LAST_COMMIT_HASH}\n- Commit message: ${LAST_COMMIT_MSG}\n- Author: ${LAST_COMMIT_AUTHOR}\n- Date: ${BEIJING_TIMESTAMP}\n\nThis PR was automatically created by the sync workflow."
         
         # Create JSON payload for PR creation
         JSON_PAYLOAD="{\"title\":\"${PR_TITLE}\",\"body\":\"${PR_BODY}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"${INPUT_TARGET_SYNC_BRANCH}\"}"
