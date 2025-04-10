@@ -11,7 +11,8 @@ push_new_commits() {
     fi
 
     # Create a new branch for changes
-    BRANCH_NAME="sync-update-$(date +%Y%m%d%H%M%S)"
+    BEIJING_TIMESTAMP=$(TZ=Asia/Shanghai date +%Y%m%d%H%M%S)
+    BRANCH_NAME="sync-update-${BEIJING_TIMESTAMP}"
     git checkout -b "${BRANCH_NAME}"
     
     # Push to the new branch instead of directly to target branch
@@ -29,7 +30,7 @@ push_new_commits() {
     LAST_COMMIT_HASH=$(git rev-parse HEAD)
     LAST_COMMIT_MSG=$(git log -1 --pretty=%B | sed 's/"/\\"/g' | tr '\n' ' ')
     LAST_COMMIT_AUTHOR=$(git log -1 --pretty=%an | sed 's/"/\\"/g')
-    LAST_COMMIT_DATE=$(git log -1 --pretty=%ad --date=format:'%Y-%m-%d %H:%M:%S')
+    LAST_COMMIT_DATE=$(TZ=Asia/Shanghai git log -1 --pretty=%ad --date=format:'%Y-%m-%d %H:%M:%S')
     
     # Create PR if GitHub token is available
     if [ -n "${INPUT_TARGET_REPO_TOKEN}" ]; then
