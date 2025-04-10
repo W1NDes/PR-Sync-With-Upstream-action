@@ -1,4 +1,8 @@
-# Github Action: Upstream Sync
+# Github Action: Upstream Sync -use pull request
+
+> 原先的fork-sync-with-upstream-action项目不支持以pr的形式同步上游更新，而wei/pull似乎不支持非fork仓库的自定义上游拉取，本项目修改了run/push_updates.sh中的push_new_commits()函数以实现pr形式的同步
+> 
+> *The original fork-sync-with-upstream-action project doesn't support syncing upstream updates in the form of PRs, and wei/pull doesn't seem to support custom upstream pulls for non-fork repositories. This project modifies the push_new_commits() function in run/push_updates.sh to enable synchronization in the form of PRs.*
 
 ## About
 
@@ -89,7 +93,7 @@ jobs:
     # Step 2: run the sync action
     - name: Sync upstream changes
       id: sync
-      uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
+      uses: W1NDes/PR-Sync-With-Upstream-action@master
       with:
         target_sync_branch: my-branch
         # REQUIRED 'target_repo_token' exactly like this!
